@@ -1,15 +1,11 @@
 package com.example.chatapplication;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
     Button btnsend, btnout;
     FirebaseUser fuser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,19 +41,25 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void blah() {
-
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if (fuser!= null){
-            Intent intent = new Intent(MainActivity.this, dashBoard.class);
-            startActivity(intent);
-            finish();
-        }else {
+        if (fuser != null) {
+            if (!fuser.getPhoneNumber().isEmpty()) {
+                Intent intent = new Intent(MainActivity.this, dashBoard.class);
+                startActivity(intent);
+                finish();
+            } else if (fuser.isEmailVerified()) {
+                Intent intent = new Intent(MainActivity.this, dashBoard.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Intent intent = new Intent(MainActivity.this, loginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        } else {
             Intent intent = new Intent(MainActivity.this, loginActivity.class);
             startActivity(intent);
             finish();

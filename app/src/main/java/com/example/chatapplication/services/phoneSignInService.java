@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -22,7 +21,6 @@ import androidx.annotation.NonNull;
 import com.example.chatapplication.R;
 import com.example.chatapplication.dashBoard;
 import com.example.chatapplication.shared.dialogSingleInput;
-import com.example.chatapplication.system.registerActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -176,7 +174,7 @@ public class phoneSignInService {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = task.getResult().getUser();
-                            us.registerToDBService(user, 1);
+                            us.registerToDBService(user, 1, null);
                             Intent intent = new Intent(mActivity, dashBoard.class);
                             intent.putExtra("id", user.getUid());
                             // create progress dialog to delay start
@@ -184,23 +182,14 @@ public class phoneSignInService {
                             progress.setTitle("Connecting");
                             progress.setMessage("Please wait while we connect to devices...");
                             progress.show();
-                            Runnable progressRunnable = new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    progress.cancel();
-                                }
-                            };
+                            Runnable progressRunnable = () -> progress.cancel();
                             Handler pdCanceller = new Handler();
                             pdCanceller.postDelayed(progressRunnable, 5000);
-                            progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        mActivity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(mActivity).toBundle());
-                                    } else {
-                                        mActivity.startActivity(intent);
-                                    }
+                            progress.setOnCancelListener(dialog -> {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    mActivity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(mActivity).toBundle());
+                                } else {
+                                    mActivity.startActivity(intent);
                                 }
                             });
                         } else {

@@ -11,11 +11,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.example.chatapplication.R;
 import com.example.chatapplication.services.googleSignInService;
+import com.example.chatapplication.services.loginService;
 import com.example.chatapplication.services.phoneSignInService;
 import com.google.android.gms.common.SignInButton;
 
@@ -28,6 +27,7 @@ public class loginActivity extends Activity {
     SignInButton ggSignInButton;
     googleSignInService gsis;
     phoneSignInService psis;
+    loginService ls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +54,7 @@ public class loginActivity extends Activity {
         ggSignInButton = (SignInButton) findViewById(R.id.btnGoogleButton);
         gsis = new googleSignInService(this, getString(R.string.default_web_client_id), this);
         psis = new phoneSignInService(this, this);
+        ls = new loginService(this, this);
     }
 
     private void bindEvent() {
@@ -76,7 +77,7 @@ public class loginActivity extends Activity {
 
     private void singin() {
         if (flag == false) {
-            Toast.makeText(this, "This is a Sign in Button", Toast.LENGTH_LONG).show();
+            ls.loginWithInfo(etusername.getText().toString().trim(), etpassword.getText().toString().trim());
         } else {
             changeView();
         }

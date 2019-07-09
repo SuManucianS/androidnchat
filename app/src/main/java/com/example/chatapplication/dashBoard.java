@@ -17,9 +17,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -107,25 +107,11 @@ public class dashBoard extends AppCompatActivity {
                 }
                 return fragment;
             }
-
-//            @Nullable
-//            @Override
-//            public CharSequence getPageTitle(int position) {
-//                switch (position) {
-//                    case 0:
-//                        return "User";
-//                    case 1:
-//                        return "Chat";
-//                    case 2:
-//                        return "Profile";
-//                }
-//                return null;
-//            }
         };
         viewPager.setAdapter(pagerAdapter);
         TabLayout tabLayout = findViewById(R.id.tablayyout);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabTextColors(R.color.colorWhite,R.color.colorPrimary);
+        tabLayout.setTabTextColors(R.color.colorWhite, R.color.colorPrimary);
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(getIcon[i]);
             tabLayout.getTabAt(i).getIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);

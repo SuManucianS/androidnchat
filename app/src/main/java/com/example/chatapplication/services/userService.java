@@ -39,7 +39,7 @@ public class userService {
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
-    public void registerToDBService(FirebaseUser user, int type) {
+    public void registerToDBService(FirebaseUser user, int type, String name) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -51,9 +51,9 @@ public class userService {
                             userModel = new userModel(user.getUid(), user.getDisplayName(), "default", "online", "available");
                             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(userModel);
                             HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("calling","nocall");
+                            hashMap.put("calling", "nocall");
                             hashMap.put("receiving", "nocall");
-                            hashMap.put("id",user.getUid());
+                            hashMap.put("id", user.getUid());
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                             ref.child("call").child(user.getUid()).setValue(hashMap);
                             break;
@@ -61,12 +61,21 @@ public class userService {
                             userModel = new userModel(user.getUid(), "null", "default", "online", "available");
                             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(userModel);
                             HashMap<String, Object> hashMap1 = new HashMap<>();
-                            hashMap1.put("calling","nocall");
+                            hashMap1.put("calling", "nocall");
                             hashMap1.put("receiving", "nocall");
-                            hashMap1.put("id",user.getUid());
+                            hashMap1.put("id", user.getUid());
                             DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference();
                             ref1.child("call").child(user.getUid()).setValue(hashMap1);
                             break;
+                        case 2:
+                            userModel = new userModel(user.getUid(), name, "default", "online", "available");
+                            FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(userModel);
+                            HashMap<String, Object> hashMap2 = new HashMap<>();
+                            hashMap2.put("calling", "nocall");
+                            hashMap2.put("receiving", "nocall");
+                            hashMap2.put("id", user.getUid());
+                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference();
+                            ref2.child("call").child(user.getUid()).setValue(hashMap2);
                     }
                 }
             }

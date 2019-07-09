@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.chatapplication.dashBoard;
@@ -17,15 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-
-import androidx.annotation.NonNull;
 
 
 public class googleSignInService {
@@ -67,48 +61,36 @@ public class googleSignInService {
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(mActivity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            us.registerToDBService(user, 0);
-                            Intent intent = new Intent(mActivity, dashBoard.class);
-                            intent.putExtra("id", user.getUid());
-                            // create progress dialog to delay start
-                            final ProgressDialog progress = new ProgressDialog(mContext);
-                            progress.setTitle("Connecting");
-                            progress.setMessage("Please wait while we connect to devices...");
-                            progress.show();
+                .addOnCompleteListener(mActivity, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        us.registerToDBService(user, 0, null);
+                        Intent intent = new Intent(mActivity, dashBoard.class);
+                        intent.putExtra("id", user.getUid());
+                        // create progress dialog to delay start
+                        final ProgressDialog progress = new ProgressDialog(mContext);
+                        progress.setTitle("Connecting");
+                        progress.setMessage("Please wait while we connect to devices...");
+                        progress.show();
 
-                            Runnable progressRunnable = new Runnable() {
+                        Runnable progressRunnable = () -> progress.cancel();
 
-                                @Override
-                                public void run() {
-                                    progress.cancel();
-                                }
-                            };
+                        Handler pdCanceller = new Handler();
+                        pdCanceller.postDelayed(progressRunnable, 5000);
+                        progress.setOnCancelListener(dialog -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                mActivity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(mActivity).toBundle());
+                            } else {
+                                mActivity.startActivity(intent);
+                            }
+                        });
 
-                            Handler pdCanceller = new Handler();
-                            pdCanceller.postDelayed(progressRunnable, 5000);
-                            progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        mActivity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(mActivity).toBundle());
-                                    } else {
-                                        mActivity.startActivity(intent);
-                                    }
-                                }
-                            });
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Toast.makeText(mContext, "failed2", Toast.LENGTH_LONG).show();
-                        }
-
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(mContext, "failed2", Toast.LENGTH_LONG).show();
                     }
+
                 });
     }
 
